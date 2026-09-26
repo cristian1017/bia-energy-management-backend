@@ -14,7 +14,6 @@ import { MetersModule } from './modules/meters/meters.module';
 import { AnomaliesModule } from './modules/anomalies/anomalies.module';
 import { AiModule } from './modules/ai/ai.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
-import { AppController } from './app.controller';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -42,7 +41,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     AiModule,
     DashboardModule,
   ],
-  controllers: [AppController],
   providers: [AppService, SeedService],
 })
 export class AppModule {}
