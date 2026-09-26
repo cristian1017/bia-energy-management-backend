@@ -5,9 +5,12 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "build": "nest build",
+    "vercel-build": "npm run build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -19,8 +22,7 @@
     "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "vercel-build": "nest build && node -e \"require('fs').writeFileSync('dist/package.json', JSON.stringify({ type: 'commonjs' }))\""
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@google/genai": "^2.24.0",
@@ -48,7 +50,6 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/supertest": "^7.0.0",
-    "@vercel/node": "^16.0.1",
     "jest": "^30.0.0",
     "oxlint": "^1.58.0",
     "prettier": "^3.4.2",

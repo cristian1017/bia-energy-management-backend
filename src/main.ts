@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-async function bootstrap() {
+export async function createApp() {
   const app = await NestFactory.create(AppModule, {
     instrument: ObserveInstrument,
   });
@@ -31,6 +31,14 @@ async function bootstrap() {
   // La documentación quedará accesible en /api/docs
   SwaggerModule.setup('api/docs', app, document);
 
+  return app;
+}
+
+async function bootstrap() {
+  const app = await createApp();
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+
+if (require.main === module) {
+  void bootstrap();
+}

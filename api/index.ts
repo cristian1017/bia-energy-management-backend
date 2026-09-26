@@ -1,34 +1,21 @@
+import type { Request, Response } from 'express';
+import { createApp } from '../dist/main.js';
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+let expressApp: Promise<any> | undefined;
 
-let app: any;
-const loadModule = new Function(
-  'modulePath',
-  'return import(modulePath);',
-) as (modulePath: string) => Promise<any>;
-
-async function bootstrap() {
-  if (!app) {
-    const { NestFactory } = await loadModule('@nestjs/core');
-    const { ExpressAdapter } = await loadModule('@nestjs/platform-express');
-    const express = (await loadModule('express')).default;
-    const { AppModule } = await loadModule('../dist/app.module.js');
-
-    const expressApp = express();
-    const nestApp = await NestFactory.create(
-      AppModule,
-      new ExpressAdapter(expressApp),
-      { logger: ['error', 'warn'] }
-    );
-
-    nestApp.enableCors();
-    await nestApp.init();
-    app = expressApp;
+async function getExpressApp() {
+  if (!expressApp) {
+    expressApp = (async () => {
+      const nestApp = await createApp();
+      await nestApp.init();
+      return nestApp.getHttpAdapter().getInstance();
+    })();
   }
-  return app;
+
+  return expressApp;
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const expressInstance = await bootstrap();
-  return expressInstance(req, res);
+export default async function handler(request: Request, response: Response) {
+  const app = await getExpressApp();
+  return app(request, response);
 }
