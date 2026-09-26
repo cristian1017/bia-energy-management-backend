@@ -1,26 +1,20 @@
-import {
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BaseService } from '../../common/base.service';
 import { Meter } from '../../db/entities/meter.entity';
 import { Reading } from '../../db/entities/reading.entity';
 
 @Injectable()
-export class MetersService {
-  private readonly logger = new Logger(MetersService.name);
-  
-
+export class MetersService extends BaseService {
   constructor(
     @InjectRepository(Meter)
     private readonly meterRepo: Repository<Meter>,
     @InjectRepository(Reading)
     private readonly readingRepo: Repository<Reading>,
-  ) {}
+  ) {
+    super(MetersService.name);
+  }
 
   async findAll(): Promise<Meter[]> {
     try {
@@ -39,7 +33,9 @@ export class MetersService {
       });
 
       if (!meter) {
-        throw new NotFoundException(`El medidor con ID '${meterId}' no fue encontrado.`);
+        throw new NotFoundException(
+          `El medidor con ID '${meterId}' no fue encontrado.`,
+        );
       }
 
       return meter;
@@ -57,16 +53,10 @@ export class MetersService {
         order: { timestamp: 'ASC' },
       });
     } catch (error) {
-      this.handleError(error, `No fue posible obtener las lecturas del medidor '${meterId}'.`);
+      this.handleError(
+        error,
+        `No fue posible obtener las lecturas del medidor '${meterId}'.`,
+      );
     }
-  }
-
-  private handleError(error: unknown, message: string): never {
-    if (error instanceof HttpException) {
-      throw error;
-    }
-
-    this.logger.error(message, error instanceof Error ? error.stack : String(error));
-    throw new InternalServerErrorException(message);
   }
 }

@@ -7,7 +7,8 @@ import { Meter } from '../../../db/entities/meter.entity';
 import { Reading } from '../../../db/entities/reading.entity';
 import { Event } from '../../../db/entities/event.entity';
 import { Anomaly } from '../../../db/entities/anomaly.entity';
-
+import { buildEnergyAnomalyPrompt } from '../prompt/energy-anomaly.prompt';
+import type { AiAnomalyResult, MeterSuspectData } from '../types/ai-analysis.types';
 
 @Injectable()
 export class AiAnalysisService {
@@ -32,7 +33,7 @@ export class AiAnalysisService {
     const apiKey = this.getApiKey();
 
     const meters = await this.meterRepo.find();
-    const suspectMetersData = [];
+    const suspectMetersData: MeterSuspectData[] = [];
 
     for (const meter of meters) {
       const suspectData = await this.extractSuspectDataForMeter(meter.meter_id);
@@ -75,7 +76,7 @@ export class AiAnalysisService {
   /**
    * Extrae la evidencia técnica de un medidor (Filtro Local / Capa 1).
    */
-  private async extractSuspectDataForMeter(meterId: string): Promise<any | null> {
+  private async extractSuspectDataForMeter(meterId: string): Promise<MeterSuspectData | null> {
     const readings = await this.readingRepo.find({
       where: { meter_id: meterId },
       order: { timestamp: 'ASC' },
@@ -129,7 +130,7 @@ export class AiAnalysisService {
   /**
    * Persiste las anomalías devueltas por la IA y actualiza el estado operacional del medidor.
    */
-  private async saveAnomaliesAndStatus(aiResults: any[]): Promise<Anomaly[]> {
+  private async saveAnomaliesAndStatus(aiResults: AiAnomalyResult[]): Promise<Anomaly[]> {
     const savedAnomalies: Anomaly[] = [];
 
     for (const res of aiResults) {
@@ -182,37 +183,10 @@ export class AiAnalysisService {
    */
   private async callGeminiSdkWithFallback(
     apiKey: string,
-    suspectData: any[],
-  ): Promise<any[]> {
+    suspectData: MeterSuspectData[],
+  ): Promise<AiAnomalyResult[]> {
     const ai = new GoogleGenAI({ apiKey });
-
-    const prompt = `
-Eres un ingeniero experto en sistemas de gestión de energía industrial y diagnósticos eléctricos.
-Analiza la siguiente evidencia técnica de medidores eléctricos sospechosos y clasifica cada uno.
-
-EVIDENCIA TÉCNICA:
-${JSON.stringify(suspectData, null, 2)}
-
-INSTRUCCIONES DE CLASIFICACIÓN:
-Debes clasificar CADA medidor en uno de estos 4 tipos exactos:
-1. "REAL ANOMALY" (Severidad: HIGH): Desviación severa de consumo/voltaje sin evento operativo justificable.
-2. "EXPLAINABLE ANOMALY" (Severidad: MEDIUM): Aumentos o variaciones de consumo justificados por expansión o cambios en la línea de producción.
-3. "FALSE POSITIVE" (Severidad: LOW): Caídas de consumo o variaciones causadas directamente por eventos de mantenimiento programado o paradas operativas registradas.
-4. "DATA QUALITY" (Severidad: HIGH): Lecturas cero, nulas, imposibles o falla evidente de sensor/comunicación.
-
-FORMATO DE RESPUESTA REQUERIDO:
-Responde ÚNICAMENTE con un arreglo JSON válido (sin sintaxis markdown alrededor):
-[
-  {
-    "meter_id": "M-XXX",
-    "type": "REAL ANOMALY",
-    "severity": "HIGH",
-    "confidence": 0.95,
-    "reason": "Explicación técnica en español...",
-    "recommended_action": "Acción recomendada en español..."
-  }
-]
-`;
+    const prompt = buildEnergyAnomalyPrompt(suspectData);
 
     const candidateModels = [
       'gemini-3.5-flash-lite',
@@ -221,7 +195,7 @@ Responde ÚNICAMENTE con un arreglo JSON válido (sin sintaxis markdown alrededo
       'gemini-2.5-flash',
     ];
 
-    let lastError: any = null;
+    let lastError: unknown;
 
     for (const modelName of candidateModels) {
       try {
@@ -248,6 +222,9 @@ Responde ÚNICAMENTE con un arreglo JSON válido (sin sintaxis markdown alrededo
       }
     }
 
-    throw lastError || new Error('Ningún modelo de Gemini estuvo disponible para procesar el diagnóstico.');
+    throw (
+      lastError ||
+      new Error('Ningún modelo de Gemini estuvo disponible para procesar el diagnóstico.')
+    );
   }
 }

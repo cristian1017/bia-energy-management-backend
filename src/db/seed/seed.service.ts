@@ -8,6 +8,8 @@ import { Meter } from '../entities/meter.entity';
 import { Reading } from '../entities/reading.entity';
 import { Event } from '../entities/event.entity';
 
+type CsvRow = Record<string, string>;
+
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -142,14 +144,14 @@ export class SeedService implements OnModuleInit {
     }
   }
 
-  private parseCsv(filePath: string): Promise<any[]> {
+  private parseCsv(filePath: string): Promise<CsvRow[]> {
     return new Promise((resolve, reject) => {
-      const results: any[] = [];
+      const results: CsvRow[] = [];
       const parser = csv();
 
       fs.createReadStream(filePath)
         .pipe(parser)
-        .on('data', (data: Record<string, string>) => results.push(data))
+        .on('data', (data: CsvRow) => results.push(data))
         .on('end', () => resolve(results))
         .on('error', (error: Error) => reject(error));
     });
