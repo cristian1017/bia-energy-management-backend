@@ -89,10 +89,11 @@ npm run build
 npm run start:prod
 ```
 
-La aplicación quedará disponible en:
+## URLs de producción
 
-- http://localhost:3000
-- Swagger: http://localhost:3000/api/docs
+- **Backend API:** [https://bia-energy-management-backend.vercel.app/](https://bia-energy-management-backend.vercel.app/)
+- **Frontend:** [https://bia-energy-management-front.vercel.app/](https://bia-energy-management-front.vercel.app/)
+
 
 ## Endpoints principales
 
