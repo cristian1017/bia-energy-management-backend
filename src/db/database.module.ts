@@ -12,16 +12,25 @@ import { Reading } from './entities/reading.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USER', 'postgres'),
-        password: configService.get<string>('DB_PASSWORD', 'postgrespassword'),
-        database: configService.get<string>('DB_NAME', 'energy_db'),
-        entities: [Meter, Reading, Event, Anomaly],
-        synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
-      }),
+      useFactory: (configService: ConfigService) => {
+        const isProduction =
+          configService.get<string>('NODE_ENV') === 'production';
+
+        return {
+          type: 'postgres',
+          host: configService.get<string>('DB_HOST', 'localhost'),
+          port: configService.get<number>('DB_PORT', 5432),
+          username: configService.get<string>('DB_USER', 'postgres'),
+          password: configService.get<string>(
+            'DB_PASSWORD',
+            'postgrespassword',
+          ),
+          database: configService.get<string>('DB_NAME', 'energy_db'),
+          entities: [Meter, Reading, Event, Anomaly],
+          synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
+        };
+      },
     }),
   ],
 })
