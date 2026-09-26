@@ -16,7 +16,6 @@ describe('AiService', () => {
     runAiAnalysis: jest.MockedFunction<AiAnalysisService['runAiAnalysis']>;
     runAiAnalysisForMeter: jest.MockedFunction<AiAnalysisService['runAiAnalysisForMeter']>;
   };
-  let anomalyRepo: jest.Mocked<Pick<Repository<Anomaly>, 'findOne'>>;
   let meterRepo: jest.Mocked<Pick<Repository<Meter>, 'findOne'>>;
 
   beforeEach(() => {
@@ -26,16 +25,12 @@ describe('AiService', () => {
       runAiAnalysis: jest.fn<AiAnalysisService['runAiAnalysis']>(),
       runAiAnalysisForMeter: jest.fn<AiAnalysisService['runAiAnalysisForMeter']>(),
     };
-    anomalyRepo = {
-      findOne: jest.fn<Repository<Anomaly>['findOne']>(),
-    };
     meterRepo = {
       findOne: jest.fn<Repository<Meter>['findOne']>(),
     };
 
     service = new AiService(
       aiAnalysisService as unknown as AiAnalysisService,
-      anomalyRepo as unknown as Repository<Anomaly>,
       meterRepo as unknown as Repository<Meter>,
     );
   });
@@ -72,7 +67,6 @@ describe('AiService', () => {
       await expect(service.getAnalysisById('M-404')).rejects.toBeInstanceOf(
         NotFoundException,
       );
-      expect(anomalyRepo.findOne).not.toHaveBeenCalled();
       expect(aiAnalysisService.runAiAnalysisForMeter).not.toHaveBeenCalled();
     });
 
@@ -84,7 +78,6 @@ describe('AiService', () => {
       aiAnalysisService.runAiAnalysisForMeter.mockResolvedValue([anomaly]);
 
       await expect(service.getAnalysisById(meterId)).resolves.toBe(anomaly);
-      expect(anomalyRepo.findOne).not.toHaveBeenCalled();
       expect(aiAnalysisService.runAiAnalysisForMeter).toHaveBeenCalledWith(meterId);
     });
 
@@ -93,7 +86,6 @@ describe('AiService', () => {
       const meter = { meter_id: meterId } as Meter;
       const anomaly = { id: 'anomaly-2', meter_id: meterId } as Anomaly;
       meterRepo.findOne.mockResolvedValue(meter);
-      anomalyRepo.findOne.mockResolvedValue(null);
       aiAnalysisService.runAiAnalysisForMeter.mockResolvedValue([anomaly]);
 
       await expect(service.getAnalysisById(meterId)).resolves.toBe(anomaly);
@@ -103,7 +95,6 @@ describe('AiService', () => {
     it('returns an OK message when the fresh analysis finds no anomalies', async () => {
       const meterId = 'M-101';
       meterRepo.findOne.mockResolvedValue({ meter_id: meterId } as Meter);
-      anomalyRepo.findOne.mockResolvedValue(null);
       aiAnalysisService.runAiAnalysisForMeter.mockResolvedValue([]);
 
       await expect(service.getAnalysisById(meterId)).resolves.toEqual({

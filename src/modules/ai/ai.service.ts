@@ -1,27 +1,20 @@
-import {
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AiAnalysisService } from '../../provider/llm/service/ai-analysis.service';
+import { BaseService } from '../../common/base.service';
 import { Anomaly } from '../../db/entities/anomaly.entity';
 import { Meter } from '../../db/entities/meter.entity';
+import { AiAnalysisService } from '../../provider/llm/service/ai-analysis.service';
 
 @Injectable()
-export class AiService {
-  private readonly logger = new Logger(AiService.name);
-
+export class AiService extends BaseService {
   constructor(
     private readonly aiAnalysisService: AiAnalysisService,
-    @InjectRepository(Anomaly)
-    private readonly anomalyRepo: Repository<Anomaly>,
     @InjectRepository(Meter)
     private readonly meterRepo: Repository<Meter>,
-  ) {}
+  ) {
+    super(AiService.name);
+  }
 
   async getAnalysis(): Promise<{ message: string; anomalies: Anomaly[] }> {
     try {
@@ -63,17 +56,5 @@ export class AiService {
         `No fue posible obtener el dictamen '${meterId}'.`,
       );
     }
-  }
-
-  private handleError(error: unknown, message: string): never {
-    if (error instanceof HttpException) {
-      throw error;
-    }
-
-    this.logger.error(
-      message,
-      error instanceof Error ? error.stack : String(error),
-    );
-    throw new InternalServerErrorException(message);
   }
 }

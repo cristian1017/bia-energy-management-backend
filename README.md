@@ -1,114 +1,189 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+﻿# Bia Energy Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend en NestJS para la gestión de telemetría eléctrica, análisis de anomalías y evaluación con IA. El sistema expone una API REST para consultar resúmenes del tablero, historial de lecturas, medidores y resultados de análisis inteligentes.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Objetivo del proyecto
 
-## Description
+Este backend soporta un flujo de monitoreo para:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Revisar medidores y sus lecturas históricas,
+- Detectar anomalías mediante lógica de negocio y análisis con Gemini,
+- Devolver un dictamen técnico con sugerencias operativas.
 
-## Project setup
+## Stack tecnológico
 
-```bash
-$ npm install
+- Node.js + TypeScript
+- NestJS
+- TypeORM
+- PostgreSQL
+- Swagger / OpenAPI
+- Google Gemini API
+- Jest
+
+## Estructura principal
+
+```text
+src/
+├── app.controller.ts
+├── app.module.ts
+├── main.ts
+├── db/
+│   ├── entities/
+│   └── seed/
+├── modules/
+│   ├── ai/
+│   ├── anomalies/
+│   ├── dashboard/
+│   └── meters/
+├── provider/
+│   └── llm/
 ```
 
-## Compile and run the project
+## Requisitos previos
+
+- Node.js 18 o superior
+- npm
+- Base de datos PostgreSQL disponible
+- Clave de API de Google Gemini
+
+## Configuración del entorno
+
+Copia el archivo `env.template` a un archivo `.env` y ajusta los valores:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp env.template .env
 ```
 
-## Run tests
+Contenido esperado:
+
+```env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgrespassword
+DB_NAME=energy_db
+
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+## Instalación
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+## Ejecución
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Desarrollo
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Producción
 
-## Observability
+```bash
+npm run build
+npm run start:prod
+```
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+La aplicación quedará disponible en:
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+- http://localhost:3000
+- Swagger: http://localhost:3000/api/docs
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+## Endpoints principales
 
-## Resources
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/dashboard/summary` | Resumen del tablero con KPIs globales |
+| GET | `/meters` | Listado de medidores |
+| GET | `/meters/:meterId` | Información de un medidor |
+| GET | `/meters/:meterId/readings` | Lecturas históricas del medidor |
+| GET | `/anomalies` | Listado completo de anomalías |
+| GET | `/anomalies/:meterId` | Anomalías de un medidor específico |
+| POST | `/ai/analyze` | Ejecuta análisis global de IA |
+| GET | `/ai/analysis/:id` | Devuelve el dictamen para un medidor |
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📊 Métricas calculadas y umbrales de estadísticas
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+El sistema calcula indicadores clave sobre cada medidor para detectar comportamiento anómalo frente a su historial.
 
-## Support
+### 1. Consumo actual y línea base
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- Consumo actual: última lectura registrada del medidor.
+- Línea base: promedio histórico de consumo para ese medidor.
 
-## Stay in touch
+$$
+\text{Baseline} = \frac{\sum \text{Lecturas de consumo}}{N}
+$$
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 2. Variación porcentual
 
-## License
+Se mide la desviación del consumo actual respecto a la línea base:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+$$
+\Delta\% = \left(\frac{\text{Último consumo} - \text{Baseline}}{\text{Baseline}}\right) \times 100
+$$
+
+### 3. Umbrales de anomalía
+
+Los valores de referencia para activar alertas se obtuvieron revisando el conjunto de datos de prueba y la distribución histórica de cada variable. El objetivo fue identificar valores que se apartan claramente de la operación normal sin generar falsos positivos frecuentes.
+
+- Voltaje bajo: menor a 180 V. Este umbral aparece como un corte operativo claro en el dataset, donde los valores inferiores marcan condiciones de riesgo o desbalance eléctrico.
+- Factor de potencia bajo: menor a 0.75. La mayor parte de las lecturas normales se mantiene por encima de ese nivel; por debajo, indica ineficiencia o pérdida de rendimiento.
+- Variación de consumo alta: por encima de 20% respecto a la línea base. Se usa como señal de crecimiento o caída atípica del consumo frente al comportamiento medio del medidor.
+- Picos de consumo atípicos: lecturas que superan la media histórica por un margen significativo. Se detectan mediante comparación con la tendencia del medidor y no solo con un único valor aislado.
+
+En términos matemáticos, cada alerta se activa cuando una métrica se aparta de su rango esperable:
+
+$$
+\text{Anomalía} \iff \left( V < 180 \right) \;\lor\; \left( PF < 0.75 \right) \;\lor\; \left(|\Delta\%| > 20\% \right)
+$$
+
+donde $V$ es el voltaje, $PF$ el factor de potencia y $\Delta\%$ la variación porcentual respecto a la línea base.
+
+### 4. Regla operativa
+
+Si se cumple uno o más umbrales relevantes, el sistema marca la situación como anómala y genera un dictamen con:
+
+- Severidad,
+- Nivel de confianza,
+- Explicación técnica,
+- Acción recomendada para mantenimiento.
+
+Esto permite que la IA interprete el contexto de la instalación y no solo compare valores aislados.
+
+## Flujo de análisis IA
+
+El backend puede realizar una evaluación de anomalías de varios tipos, como:
+
+- Consumo fuera de línea base,
+- Caídas de voltaje,
+- Factor de potencia bajo,
+- Picos de intensidad o consumo atípicos,
+- Condiciones que requieren intervención técnica.
+
+El servicio de IA genera un dictamen estructurado que puede usarse en el frontend para mostrar severidad, confianza y acción recomendada.
+
+## Pruebas
+
+Ejecuta la suite:
+
+```bash
+npm test
+```
+
+
+## Notas
+
+- El proyecto usa TypeORM con entidades y seed para cargar datos base.
+- La documentación interactiva de Swagger queda en `/api/docs`.
+- Se habilita CORS para integración con frontend.
+
+
+---
+
+Hecho para Bia Energy.
