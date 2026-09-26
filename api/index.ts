@@ -2,13 +2,17 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 let app: any;
+const loadModule = new Function(
+  'modulePath',
+  'return import(modulePath);',
+) as (modulePath: string) => Promise<any>;
 
 async function bootstrap() {
   if (!app) {
-    const { NestFactory } = await import('@nestjs/core');
-    const { ExpressAdapter } = await import('@nestjs/platform-express');
-    const express = (await import('express')).default;
-    const { AppModule } = await import('../src/app.module');
+    const { NestFactory } = await loadModule('@nestjs/core');
+    const { ExpressAdapter } = await loadModule('@nestjs/platform-express');
+    const express = (await loadModule('express')).default;
+    const { AppModule } = await loadModule('../dist/app.module.js');
 
     const expressApp = express();
     const nestApp = await NestFactory.create(
