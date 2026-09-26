@@ -76,19 +76,16 @@ describe('AiService', () => {
       expect(aiAnalysisService.runAiAnalysisForMeter).not.toHaveBeenCalled();
     });
 
-    it('returns a pending anomaly when one already exists', async () => {
+    it('runs a fresh analysis for the meter and returns the first anomaly found', async () => {
       const meterId = 'M-101';
       const meter = { meter_id: meterId } as Meter;
       const anomaly = { id: 'anomaly-1', meter_id: meterId } as Anomaly;
       meterRepo.findOne.mockResolvedValue(meter);
-      anomalyRepo.findOne.mockResolvedValue(anomaly);
+      aiAnalysisService.runAiAnalysisForMeter.mockResolvedValue([anomaly]);
 
       await expect(service.getAnalysisById(meterId)).resolves.toBe(anomaly);
-      expect(anomalyRepo.findOne).toHaveBeenCalledWith({
-        where: { meter_id: meterId, status: 'PENDING' },
-        order: { detected_at: 'DESC' },
-      });
-      expect(aiAnalysisService.runAiAnalysisForMeter).not.toHaveBeenCalled();
+      expect(anomalyRepo.findOne).not.toHaveBeenCalled();
+      expect(aiAnalysisService.runAiAnalysisForMeter).toHaveBeenCalledWith(meterId);
     });
 
     it('runs a fresh analysis and returns its first anomaly', async () => {

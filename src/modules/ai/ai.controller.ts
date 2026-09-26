@@ -1,4 +1,11 @@
-import { Controller, Post, Get, Param, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AiService } from './ai.service';
 import { Anomaly } from '../../db/entities/anomaly.entity';
 

@@ -46,20 +46,6 @@ export class AiService {
         throw new NotFoundException(`El medidor '${meterId}' no existe.`);
       }
 
-      // 2. Buscamos si ya existe un análisis pendiente de revisión
-      const existingAnomaly = await this.anomalyRepo.findOne({
-        where: {
-          meter_id: meterId,
-          status: 'PENDING',
-        },
-        order: { detected_at: 'DESC' },
-      });
-
-      if (existingAnomaly) {
-        return existingAnomaly;
-      }
-
-      // 3. Si no existe un análisis 'PENDING', ejecutamos el análisis de IA en tiempo real
       const freshAnomalies =
         await this.aiAnalysisService.runAiAnalysisForMeter(meterId);
 
