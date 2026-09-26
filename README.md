@@ -125,10 +125,10 @@ $$
 Se mide la desviación del consumo actual respecto a la línea base:
 
 $$
-\Delta\% = \frac{C_{\mathrm{actual}} - C_{\mathrm{base}}}{C_{\mathrm{base}}} \times 100
+\text{Variación} = \frac{\text{Consumo actual - Baseline }}{Baseline} x 100
 $$
 
-donde $C_{\mathrm{actual}}$ es el último consumo registrado y $C_{\mathrm{base}}$ es la línea base del medidor.
+El resultado representa el porcentaje de cambio del último consumo registrado frente a la línea base del medidor.
 
 ### 3. Umbrales de anomalía
 
@@ -139,7 +139,7 @@ Los valores de referencia para activar alertas se obtuvieron revisando el conjun
 - Variación de consumo alta: por encima de 20% respecto a la línea base. Se usa como señal de crecimiento o caída atípica del consumo frente al comportamiento medio del medidor.
 - Picos de consumo atípicos: lecturas que superan la media histórica por un margen significativo. Se detectan mediante comparación con la tendencia del medidor y no solo con un único valor aislado.
 
-En términos matemáticos, cada alerta se activa cuando una métrica se aparta de su rango esperable:
+En términos matemáticos, cada alerta se activa cuando una métrica se aparta de su rango esperable: 
 
 $$
 \mathrm{Anomalia} \iff (V < 180) \lor (PF < 0.75) \lor (|\Delta\%| > 20\%)
