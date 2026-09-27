@@ -94,6 +94,10 @@ npm run start:prod
 - **Backend API:** [https://bia-energy-management-backend.vercel.app/](https://bia-energy-management-backend.vercel.app/)
 - **Frontend:** [https://bia-energy-management-front.vercel.app/](https://bia-energy-management-front.vercel.app/)
 
+## Despliegue
+
+El backend está desplegado en **Vercel** y utiliza una base de datos **PostgreSQL alojada en Supabase**. En la configuración de variables de entorno del proyecto en Vercel, define las credenciales de conexión de Supabase mediante `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME`, además de `GEMINI_API_KEY`.
+
 
 ## Endpoints principales
 

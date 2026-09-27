@@ -17,14 +17,14 @@ export class Anomaly {
   @Column()
   meter_id: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   detected_at: Date;
 
   @Column()
-  type: string; // REAL ANOMALY, EXPLAINABLE ANOMALY, DATA QUALITY, FALSE POSITIVE
+  type: string;
 
   @Column()
-  severity: string; // HIGH, MEDIUM, LOW
+  severity: string;
 
   @Column({ type: 'float' })
   confidence: number;

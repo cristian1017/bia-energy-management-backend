@@ -5,7 +5,7 @@
   "outputDirectory": "public",
   "functions": {
     "api/index.ts": {
-      "includeFiles": "data/**"
+      "includeFiles": "{data/**,node_modules/swagger-ui-dist/**}"
     }
   },
   "rewrites": [
